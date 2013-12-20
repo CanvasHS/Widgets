@@ -39,6 +39,10 @@ data Widget =
         radioId :: String,
         options :: [String]
     }
+    | DropDown {
+        dropDownId :: String,
+        options :: [String],
+        selected :: Int
     | NoWidget
 
 data CombinedState a 
