@@ -34,8 +34,8 @@ data WidgetState
 
 emptyWidgetState = WidgetState [] NoWidget
 
-data Widget =
-    RadioButtons {
+data Widget 
+    = RadioButtons {
         radioId :: String,
         options :: [String]
     }
@@ -43,6 +43,7 @@ data Widget =
         dropDownId :: String,
         options :: [String],
         selected :: Int
+    }
     | NoWidget
 
 data CombinedState a 
@@ -89,20 +90,19 @@ drawOne (RadioButtons{radioId = radioId, options = options}) = Container 256 (32
 
 -- | deze functie is overduidelijk niet pure
 installWidgetHandler :: Callback a -> a -> IO ()
-installWidgetHandler callback state = installEventHandler (widgetHandler) combinedState
+installWidgetHandler cb state = installEventHandler widgetHandler startState
     where
-        widgetState = emptyWidgetState
-        combinedState = CombinedState widgetState state callback
+        startState = (CombinedState{widgetState=emptyWidgetState, userState=state, callback=cb})
 
---widgetHandler :: CombinedState a => a -> t -> (a, Output)
-widgetHandler st e = (st, cb st e)
+widgetHandler :: CombinedState a -> Event -> (CombinedState a, Output)
+widgetHandler st e = (st', output)
 --widgetHandler st (MouseClick (x,y) id)
 --    | startsWith "checkbox:" id = cb st StartEvent
 --
 --
     where
-        cb = callback st
-
+        (us, output) = (callback st) (userState st) e
+        st' = st{userState=us}
 --widgetHandler st e = (st, shape $ drawAll $ widgetState $ st)
 
 -- | Utility
